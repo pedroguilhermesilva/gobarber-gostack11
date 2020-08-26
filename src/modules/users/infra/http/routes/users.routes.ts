@@ -2,49 +2,23 @@ import { Router } from 'express';
 import multer from 'multer';
 import uploadConfig from '@config/upload';
 
-import UsersRepository from '@modules/users/infra/typeorm/repositories/UsersRepository';
-import CreateUserService from '@modules/users/services/CreateUsersService';
-import UpdateUserAvatarService from '@modules/users/services/UpdateUserAvatarService';
+import UsersController from '@modules/users/infra/http/controllers/UsersController';
+import UserAvatarController from '@modules/users/infra/http/controllers/UserAvatarController';
 
 import ensureAuthenticated from '../middlewares/ensureAuthenticated';
 
 const userRouter = Router();
+const usersController = new UsersController();
+const userAvatarController = new UserAvatarController();
 const upload = multer(uploadConfig);
 
-userRouter.post('/', async (request, response) => {
-  const { name, email, password } = request.body;
-
-  const usersRepository = new UsersRepository();
-  const createUser = new CreateUserService(usersRepository);
-
-  const user = await createUser.execute({
-    name,
-    email,
-    password,
-  });
-
-  delete user.password;
-
-  return response.json(user);
-});
+userRouter.post('/', usersController.create);
 
 userRouter.patch(
   '/avatar',
   ensureAuthenticated,
   upload.single('avatar'),
-  async (request, response) => {
-    const usersRepository = new UsersRepository();
-    const UpdateUserAvatar = new UpdateUserAvatarService(usersRepository);
-
-    const user = await UpdateUserAvatar.execute({
-      user_id: request.user.id,
-      avatarFilename: request.file.filename,
-    });
-
-    delete user.password;
-
-    return response.json(user);
-  },
+  userAvatarController.update,
 );
 
 export default userRouter;
