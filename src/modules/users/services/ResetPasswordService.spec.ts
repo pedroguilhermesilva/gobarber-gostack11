@@ -65,7 +65,7 @@ describe('ResetPassword', () => {
     ).rejects.toBeInstanceOf(AppError)
   });
 
-  it('should be able to reset the password if passed more than 2 hours', async () => {
+  it('should not be able to reset the password if passed more than 2 hours', async () => {
     const user = await fakeUsersRepository.create({
       name: 'John Doe',
       email: 'johndoe@example.com',
@@ -74,6 +74,12 @@ describe('ResetPassword', () => {
 
     const { token } = await fakeUserTokensRepository.generate(user.id);
 
+    /**
+     * ---jest.spyOn(Date, 'now').mockImplementationOnce---
+     * Simulation when Date.now() is call return Date.Hours + 3, 
+     * for example if Hours is 3 return 6, so when Date.now() is call on 
+     * ResetPasswordService verify this Date.now() mock is after that compareDate
+     **/
     jest.spyOn(Date, 'now').mockImplementationOnce(() => {
       const customDate = new Date();
 
