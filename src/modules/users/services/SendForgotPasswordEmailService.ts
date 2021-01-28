@@ -17,7 +17,7 @@ class SendForgotPasswordEmailService {
     @inject('UsersRepository')
     private usersRepository: IUserRepository,
 
-    @inject('IMailProvider')
+    @inject('MailProvider')
     private mailProvider: IMailProvider,
 
     @inject('UserTokensRepository')
@@ -31,9 +31,9 @@ class SendForgotPasswordEmailService {
       throw new AppError('User does not exist.')
     }
 
-    await this.userTokensRepository.generate(user.id);
+    const { token } = await this.userTokensRepository.generate(user.id);
 
-    this.mailProvider.sendMail(email, "Pedido de recuperação de senha recebido");
+    await this.mailProvider.sendMail(email, `Pedido de recuperação de senha recebido: ${token}`);
   }
 }
 
