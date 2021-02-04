@@ -1,4 +1,4 @@
-import { uuid } from 'uuidv4';
+import { v4 as uuidv4 } from 'uuid';
 import { isEqual, getMonth, getYear, getDate } from 'date-fns';
 import IAppointmentsRepository from '@modules/appointements/repositories/IAppoitmentsRepository';
 import ICreateAppointmentDTO from '@modules/appointements/dtos/ICreateAppointmentDTO';
@@ -51,12 +51,13 @@ class AppointmentsRepository implements IAppointmentsRepository {
 
   public async create({
     provider_id,
+    user_id,
     date,
   }: ICreateAppointmentDTO): Promise<Appointments> {
     const appointment = new Appointments();
 
     // It's the same as the code below
-    Object.assign(appointment, { id: uuid(), date, provider_id });
+    Object.assign(appointment, { id: uuidv4(), date, provider_id, user_id });
 
     // appointment.id = uudi();
     // appointment.date = date;
